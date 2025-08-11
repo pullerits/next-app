@@ -16,6 +16,12 @@
 }
 
 
+html {
+  /* Prevent bounce/rubber band scrolling on macOS */
+  overscroll-behavior: none;
+  overflow-x: hidden;
+}
+
 body {
   /* Single site-wide background gradient visible through transparent sections/cards */
   background:
@@ -28,6 +34,9 @@ body {
   background-size: cover;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  /* Prevent bounce/rubber band scrolling on macOS */
+  overscroll-behavior: none;
+  overflow-x: hidden;
 }
 
 /* Utilities */
