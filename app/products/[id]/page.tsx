@@ -1,19 +1,17 @@
-'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
-import { mockProducts } from '@/lib/mock-data';
-import CartButton from '@/components/cart/CartButton';
+import { getProductById } from '@/lib/database';
+import AddToCart from './AddToCart';
 
 interface ProductPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export default function ProductPage({ params }: ProductPageProps) {
-  const { id } = params;
-  const product = mockProducts.find(p => p.id === id);
+export default async function ProductPage({ params }: ProductPageProps) {
+  const { id } = await params;
+  const product = await getProductById(id);
 
   if (!product) {
     notFound();
@@ -31,20 +29,30 @@ export default function ProductPage({ params }: ProductPageProps) {
     return '/placeholder.svg';
   };
 
+  // Group variant values by variant name so we render a single picker per option
+  const variantNameToValues = (product.variants ?? []).reduce(
+    (acc, variant) => {
+      if (!acc[variant.name]) {
+        acc[variant.name] = new Set<string>();
+      }
+      acc[variant.name].add(variant.value);
+      return acc;
+    },
+    {} as Record<string, Set<string>>
+  );
+
   return (
-    <>
-      <Navbar />
-      <main className="flex-1 min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Breadcrumb */}
           <nav className="mb-8">
             <ol className="flex items-center space-x-2 text-sm text-gray-600">
               <li>
-                <a href="/" className="hover:text-blue-600">Home</a>
+                <Link href="/" className="hover:text-blue-600">Home</Link>
               </li>
               <li>/</li>
               <li>
-                <a href="/products" className="hover:text-blue-600">Products</a>
+                <Link href="/products" className="hover:text-blue-600">Products</Link>
               </li>
               <li>/</li>
               <li className="text-gray-900">{product.name}</li>
@@ -136,19 +144,19 @@ export default function ProductPage({ params }: ProductPageProps) {
                 </p>
               </div>
 
-              {product.variants && product.variants.length > 0 && (
+              {Object.keys(variantNameToValues).length > 0 && (
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Options
-                  </h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Options</h3>
                   <div className="space-y-3">
-                    {product.variants.map((variant) => (
-                      <div key={variant.id}>
-                        <label className="text-sm font-medium text-gray-700">
-                          {variant.name}
-                        </label>
+                    {Object.entries(variantNameToValues).map(([variantName, values]) => (
+                      <div key={variantName}>
+                        <label className="text-sm font-medium text-gray-700">{variantName}</label>
                         <select className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                          <option value={variant.value}>{variant.value}</option>
+                          {Array.from(values).map((value) => (
+                            <option key={value} value={value}>
+                              {value}
+                            </option>
+                          ))}
                         </select>
                       </div>
                     ))}
@@ -156,24 +164,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                 </div>
               )}
 
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center border border-gray-300 rounded-md">
-                  <button className="px-3 py-2 text-gray-600 hover:text-gray-900">
-                    -
-                  </button>
-                  <span className="px-4 py-2 text-gray-900">1</span>
-                  <button className="px-3 py-2 text-gray-600 hover:text-gray-900">
-                    +
-                  </button>
-                </div>
-                
-                <CartButton
-                  onClick={() => console.log('Add to cart:', product.name)}
-                  disabled={!product.inStock}
-                >
-                  {product.inStock ? 'Add to Cart' : 'Out of Stock'}
-                </CartButton>
-              </div>
+              <AddToCart product={product} />
 
               <div className="border-t border-gray-200 pt-6">
                 <div className="grid grid-cols-2 gap-4 text-sm">
@@ -207,9 +198,7 @@ export default function ProductPage({ params }: ProductPageProps) {
               </div>
             </div>
           </div>
-        </div>
-      </main>
-      <Footer />
-    </>
+      </div>
+    </div>
   );
 }

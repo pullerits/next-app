@@ -15,8 +15,8 @@ export const mockProducts: Product[] = [
     rating: 4.8,
     reviewCount: 342,
     variants: [
-      { id: 'color', name: 'Color', value: 'Black', inStock: true },
-      { id: 'color', name: 'Color', value: 'Blue', inStock: true },
+      { id: 'color-black-1', name: 'Color', value: 'Black', inStock: true },
+      { id: 'color-blue-1', name: 'Color', value: 'Blue', inStock: true },
     ],
   },
   {
@@ -32,8 +32,8 @@ export const mockProducts: Product[] = [
     rating: 4.6,
     reviewCount: 189,
     variants: [
-      { id: 'color', name: 'Color', value: 'White', inStock: true },
-      { id: 'color', name: 'Color', value: 'Black', inStock: true },
+      { id: 'color-white-2', name: 'Color', value: 'White', inStock: true },
+      { id: 'color-black-2', name: 'Color', value: 'Black', inStock: true },
     ],
   },
   {
@@ -63,8 +63,8 @@ export const mockProducts: Product[] = [
     rating: 4.7,
     reviewCount: 98,
     variants: [
-      { id: 'color', name: 'Color', value: 'Brown', inStock: true },
-      { id: 'color', name: 'Color', value: 'Black', inStock: true },
+      { id: 'color-brown-4', name: 'Color', value: 'Brown', inStock: true },
+      { id: 'color-black-4', name: 'Color', value: 'Black', inStock: true },
     ],
   },
   {

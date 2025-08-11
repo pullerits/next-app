@@ -12,6 +12,8 @@ export interface Product {
   rating?: number;
   reviewCount?: number;
   variants?: ProductVariant[];
+  features?: string[];
+  specifications?: Record<string, string | number | boolean>;
 }
 
 export interface ProductVariant {
@@ -23,8 +25,10 @@ export interface ProductVariant {
 }
 
 export interface CartItem {
-  productId: string;
-  product: Product;
+  id: string;
+  name: string;
+  price: number;
+  image: string;
   quantity: number;
   selectedVariants?: Record<string, string>;
 }
@@ -58,15 +62,52 @@ export interface ShippingAddress {
 
 export interface Order {
   id: string;
-  customerId: string;
-  items: CartItem[];
-  subtotal: number;
-  shipping: number;
-  tax: number;
   total: number;
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  shippingAddress: ShippingAddress;
-  billingAddress: ShippingAddress;
-  createdAt: Date;
-  updatedAt: Date;
+  payment_intent_id: string | null;
+  customer_email: string | null;
+  shipping_address: ShippingAddress | null;
+  billing_address: ShippingAddress | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// Database-specific types
+export interface DatabaseProduct {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  original_price: number | null;
+  category: string;
+  tags: string[] | null;
+  in_stock: boolean;
+  stock_quantity: number;
+  rating: number | null;
+  review_count: number;
+  images: string[] | null;
+  features: string[] | null;
+  specifications: Record<string, string | number | boolean> | null;
+  created_at: string;
+  updated_at: string;
+  product_variants?: DatabaseProductVariant[];
+}
+
+export interface DatabaseProductVariant {
+  id: string;
+  name: string;
+  value: string;
+  in_stock: boolean;
+}
+
+export interface DatabaseOrder {
+  id: string;
+  total: number;
+  status: string;
+  payment_intent_id: string | null;
+  customer_email: string | null;
+  shipping_address: ShippingAddress | null;
+  billing_address: ShippingAddress | null;
+  created_at: string;
+  updated_at: string;
 }

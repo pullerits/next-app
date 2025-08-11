@@ -19,9 +19,9 @@ export default function ProductCard({ product }: ProductCardProps) {
     : '/placeholder.svg';
 
   return (
-    <div className="group relative bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-200 border border-gray-100">
+    <div className="group relative overflow-hidden bg-white rounded-xl border border-gray-200 soft-shadow hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200">
       <Link href={`/products/${product.id}`}>
-        <div className="aspect-square overflow-hidden rounded-t-lg bg-gray-200">
+        <div className="aspect-square overflow-hidden rounded-t-xl bg-gradient-to-br from-slate-100 to-slate-200">
           <Image
             src={imageSrc}
             alt={product.name}
@@ -30,7 +30,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-200"
           />
           {discountPercentage > 0 && (
-            <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 text-xs font-semibold rounded">
+            <div className="absolute top-2 left-2 bg-gradient-to-r from-rose-500 to-red-500 text-white px-2 py-1 text-xs font-semibold rounded">
               -{discountPercentage}%
             </div>
           )}
@@ -80,7 +80,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       
       <div className="p-4 pt-0">
         <button 
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-2 px-4 rounded-md hover:from-blue-700 hover:to-indigo-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           disabled={!product.inStock}
         >
           {product.inStock ? 'Add to Cart' : 'Out of Stock'}

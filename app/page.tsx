@@ -2,19 +2,13 @@ import ProductGrid from '@/components/products/ProductGrid';
 import HeroSection from '@/components/sections/HeroSection';
 import ProvenResultsSection from '@/components/sections/ProvenResultsSection';
 import WhyChooseSection from '@/components/sections/WhyChooseSection';
-import AsSeenOnSection from '@/components/sections/AsSeenOnSection';
-import { mockProducts } from '@/lib/mock-data';
+import { getFeaturedProducts } from '@/lib/database';
 
-export default function HomePage() {
-  const featuredProducts = mockProducts.slice(0, 8);
+export default async function HomePage() {
+  const featuredProducts = await getFeaturedProducts(8);
 
   return (
     <>
-      {/* Promotional Banner */}
-      <div className="bg-blue-900 text-white py-2 text-center text-sm font-medium">
-        SUMMER SALE: BUY 2 GET 1 FREE
-      </div>
-
       <HeroSection />
 
       <ProvenResultsSection />
@@ -22,13 +16,15 @@ export default function HomePage() {
       <WhyChooseSection />
 
       {/* Featured Products Section */}
-      <section className="bg-gray-50 py-16">
+      <section className="bg-transparent py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <ProductGrid products={featuredProducts} title="Featured Products" />
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-xl p-6 sm:p-8 lg:p-10">
+            <ProductGrid products={featuredProducts} title="Featured Products" />
+          </div>
         </div>
       </section>
 
-      <AsSeenOnSection />
+      {/* As Seen On section removed */}
     </>
   );
 }
