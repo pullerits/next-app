@@ -9,7 +9,8 @@ The `components/products/` directory contains reusable components for displaying
 ```
 products/
 ├── ProductCard.tsx      # Individual product display card
-└── ProductGrid.tsx      # Grid layout for product collections
+├── ProductGrid.tsx      # Grid layout for product collections
+└── ProductCatalog.tsx   # Complete product catalog with filtering and sorting
 ```
 
 ## ProductCard Component (`ProductCard.tsx`)
@@ -325,3 +326,248 @@ const [hasMore, setHasMore] = useState(true);
 - **Progressive Enhancement**: Works without JavaScript
 - **Efficient Queries**: Optimized data fetching
 - **Caching Strategy**: Client and server-side caching
+
+## ProductCatalog Component (`ProductCatalog.tsx`)
+
+### Purpose
+Complete product catalog interface with advanced filtering, sorting, and display capabilities. Serves as the main product browsing experience with comprehensive filter options and responsive layout.
+
+### Component Type
+**Client Component** - Interactive filtering and sorting requires client-side state management
+
+### Props Interface
+```typescript
+interface ProductCatalogProps {
+  products: Product[];
+}
+```
+
+### Key Features
+
+#### Advanced Filtering System
+- **Category Filter**: Dynamic categories generated from product data
+- **Price Range Filters**: Under $50, $50-$100, Over $100 (multi-select with OR logic)
+- **Availability Filters**: In Stock Only, On Sale Only
+- **Clear All Filters**: One-click filter reset functionality
+
+#### Sorting Options
+- **Price**: Low to High, High to Low
+- **Name**: Alphabetical A-Z sorting
+- **Rating**: Highest rated products first
+- **Default**: No sorting applied
+
+#### User Experience
+- **Real-time Filtering**: Instant results without page reload
+- **Filter State Visibility**: Clear indication when filters are active
+- **Responsive Design**: Sidebar filters collapse on mobile
+- **Performance Optimized**: Efficient re-rendering with useMemo
+
+### State Management
+
+#### Filter States
+```typescript
+const [selectedCategory, setSelectedCategory] = useState<string>('all');
+const [sortBy, setSortBy] = useState<SortOption>('');
+const [under50, setUnder50] = useState<boolean>(false);
+const [between50And100, setBetween50And100] = useState<boolean>(false);
+const [over100, setOver100] = useState<boolean>(false);
+const [inStockOnly, setInStockOnly] = useState<boolean>(false);
+const [onSaleOnly, setOnSaleOnly] = useState<boolean>(false);
+```
+
+#### Filter Management Functions
+```typescript
+const clearAllFilters = () => {
+  setSelectedCategory('all');
+  setSortBy('');
+  setUnder50(false);
+  setBetween50And100(false);
+  setOver100(false);
+  setInStockOnly(false);
+  setOnSaleOnly(false);
+};
+
+const hasActiveFilters = selectedCategory !== 'all' || under50 || 
+  between50And100 || over100 || inStockOnly || onSaleOnly;
+```
+
+### Filtering Logic Implementation
+
+#### Category Filtering
+```typescript
+// Dynamic categories from product data
+const categories = useMemo(() => {
+  const set = new Set<string>();
+  products.forEach((p) => set.add(p.category));
+  return Array.from(set).sort();
+}, [products]);
+
+// Apply category filter
+if (selectedCategory !== 'all') {
+  result = result.filter((p) => p.category === selectedCategory);
+}
+```
+
+#### Price Range Filtering
+```typescript
+// Multi-select price ranges with OR logic
+const anyPriceFilter = under50 || between50And100 || over100;
+if (anyPriceFilter) {
+  result = result.filter((p) => {
+    const price = p.price;
+    const isUnder50 = under50 && price < 50;
+    const isBetween = between50And100 && price >= 50 && price <= 100;
+    const isOver100 = over100 && price > 100;
+    return isUnder50 || isBetween || isOver100;
+  });
+}
+```
+
+#### Availability Filtering
+```typescript
+// In stock filter
+if (inStockOnly) {
+  result = result.filter((p) => p.inStock);
+}
+
+// On sale filter (products with original price higher than current)
+if (onSaleOnly) {
+  result = result.filter((p) => p.originalPrice && p.originalPrice > p.price);
+}
+```
+
+#### Sorting Implementation
+```typescript
+// Sort results based on selected option
+if (sortBy === 'price-low') {
+  result.sort((a, b) => a.price - b.price);
+} else if (sortBy === 'price-high') {
+  result.sort((a, b) => b.price - a.price);
+} else if (sortBy === 'name') {
+  result.sort((a, b) => a.name.localeCompare(b.name));
+} else if (sortBy === 'rating') {
+  result.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+}
+```
+
+### UI Structure and Layout
+
+#### Page Header
+- **Title and Description**: Shop branding and tagline
+- **Sort Dropdown**: Primary sorting controls
+- **Category Dropdown**: Quick category selection
+
+#### Promotional Banner
+- **Marketing Content**: Limited time offers and bundles
+- **Call-to-Action**: Shop bundles button
+- **Responsive Design**: Stacks on mobile, side-by-side on desktop
+
+#### Two-Column Layout
+```typescript
+<div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+  {/* Sidebar Filters - 1 column */}
+  <aside className="lg:col-span-1">
+    {/* Filter controls */}
+  </aside>
+  
+  {/* Product Grid - 3 columns */}
+  <section className="lg:col-span-3">
+    <ProductGrid products={filteredAndSorted} />
+  </section>
+</div>
+```
+
+#### Filter Sidebar
+- **Clear All Button**: Appears when filters are active
+- **Price Checkboxes**: Multiple price range selection
+- **Availability Checkboxes**: Stock and sale status filters
+- **Visual Styling**: Card-based design with proper spacing
+
+### Performance Optimization
+
+#### Efficient Re-rendering
+```typescript
+const filteredAndSorted = useMemo(() => {
+  // All filtering and sorting logic
+}, [products, selectedCategory, sortBy, under50, between50And100, over100, inStockOnly, onSaleOnly]);
+```
+
+#### Benefits
+- **Prevents Unnecessary Calculations**: Only recalculates when dependencies change
+- **Smooth User Experience**: No lag when applying filters
+- **Memory Efficient**: Proper cleanup of filter states
+
+### Type Safety
+
+#### Sort Options
+```typescript
+type SortOption = 'price-low' | 'price-high' | 'name' | 'rating' | '';
+```
+
+#### Product Interface Integration
+- **Full Product Type Support**: Uses complete Product interface
+- **Optional Field Handling**: Proper handling of optional product properties
+- **Type-safe Filtering**: All filters respect TypeScript types
+
+### Responsive Design Features
+
+#### Mobile Optimization
+- **Collapsible Filters**: Sidebar becomes mobile-friendly
+- **Touch-friendly Controls**: Appropriate sizing for mobile interaction
+- **Readable Typography**: Optimized text sizes for small screens
+
+#### Desktop Enhancement
+- **Sidebar Layout**: Fixed sidebar with scrollable product grid
+- **Hover States**: Enhanced desktop interactions
+- **Keyboard Navigation**: Full keyboard accessibility
+
+### Integration Points
+
+#### ProductGrid Integration
+- **Filtered Data**: Passes filtered and sorted products to grid
+- **State Synchronization**: Maintains filter state across interactions
+- **Performance**: Efficient data flow between components
+
+#### Database Integration
+- **Product Data**: Receives products from database service
+- **Dynamic Categories**: Categories generated from actual product data
+- **Real-time Updates**: Reflects current product availability
+
+### Accessibility Features
+
+#### Screen Reader Support
+- **Semantic HTML**: Proper form labels and fieldsets
+- **ARIA Labels**: Clear descriptions for interactive elements
+- **Focus Management**: Logical tab order through filters
+
+#### Keyboard Navigation
+- **Filter Controls**: Full keyboard accessibility
+- **Clear Button**: Keyboard accessible reset functionality
+- **Sort Dropdowns**: Standard select element keyboard support
+
+### Error Handling and Edge Cases
+
+#### Empty States
+- **No Products**: Graceful handling of empty product arrays
+- **No Results**: Clear messaging when filters return no results
+- **Loading States**: Proper handling during data fetching
+
+#### Filter Validation
+- **Price Logic**: Proper handling of price comparisons
+- **Category Validation**: Safe category filtering with dynamic data
+- **State Consistency**: Prevents invalid filter combinations
+
+### Future Enhancement Opportunities
+
+#### Advanced Features
+- **Search Integration**: Text-based product search
+- **More Filter Options**: Brand, features, specifications
+- **Filter Persistence**: URL parameters for shareable filtered views
+- **Infinite Scroll**: Load more products dynamically
+
+#### Analytics Integration
+- **Filter Tracking**: Monitor popular filter combinations
+- **User Behavior**: Track filtering patterns
+- **Performance Metrics**: Filter application speed monitoring
+
+This ProductCatalog component provides a comprehensive, production-ready product browsing experience with enterprise-level filtering capabilities and optimal user experience design.
