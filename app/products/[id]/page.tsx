@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getProductById } from '@/lib/database';
 import AddToCart from './AddToCart';
+import ProductGallery from './ProductGallery';
 
 interface ProductPageProps {
   params: Promise<{ id: string }>;
@@ -60,33 +61,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </nav>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="space-y-4">
-              <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 shadow-lg">
-                <Image
-                  src={getImageSrc(0)}
-                  alt={product.name}
-                  width={600}
-                  height={600}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              
-              {product.images && product.images.length > 1 && (
-                <div className="grid grid-cols-4 gap-4">
-                  {product.images.slice(1, 5).map((image, index) => (
-                    <div key={index} className="aspect-square rounded-lg overflow-hidden bg-gray-100 shadow-md">
-                      <Image
-                        src={image}
-                        alt={`${product.name} ${index + 2}`}
-                        width={150}
-                        height={150}
-                        className="w-full h-full object-cover cursor-pointer hover:opacity-80"
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <ProductGallery images={product.images} name={product.name} />
 
             <div className="space-y-6">
               <div>

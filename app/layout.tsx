@@ -20,12 +20,12 @@ export const metadata: Metadata = {
   description: "Discover premium products with secure checkout, fast shipping, and exceptional customer service. Shop TRACKPRO for the best deals and quality products.",
   keywords: ["e-commerce", "online shopping", "premium products", "trackpro"],
   authors: [{ name: "TRACKPRO Team" }],
-  themeColor: "#0b2a6b",
 };
 
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
+  themeColor: '#0b2a6b',
 };
 
 export default function RootLayout({children,}: Readonly<{children: React.ReactNode;}>) {
